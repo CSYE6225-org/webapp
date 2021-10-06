@@ -60,7 +60,7 @@ class Register(APIView):
              first_name=data.get('fname'),
               last_name=data.get('lname'),
               password=hashed)
-            return Response(data={"message": "User created successfully"}, status=status.HTTP_200_OK)
+            return Response(data={"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
     @csrf_exempt
     def get(self, request):

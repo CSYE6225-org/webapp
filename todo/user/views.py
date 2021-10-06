@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from . import models
+from datetime import datetime
 import base64
 
 import bcrypt
@@ -36,6 +37,14 @@ class Register(APIView):
         
         if not data.get('username'):
             return Response(data={"error": "Username cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+
+        try:
+            validate_email(data.get('username'))
+        except ValidationError as e:
+            return Response(data={"error": e}, status=status.HTTP_400_BAD_REQUEST)
 
         #Encrypt password
         salt = bcrypt.gensalt()
@@ -86,11 +95,11 @@ class Register(APIView):
 
                     return Response(data=json_data, status=status.HTTP_200_OK)
                 else:
-                    return Response(data={"error": "Password not authenticated"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         except models.User.DoesNotExist:
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(data={"message": "User created successfully"}, status=status.HTTP_200_OK)
+        return Response(data={"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
     @csrf_exempt
     def put(self, request):
@@ -111,19 +120,25 @@ class Register(APIView):
                 password = user_obj.password
                 # import pdb
                 # pdb.set_trace()
-                if bcrypt.checkpw(passwd, password):
+                try:
+                    if bcrypt.checkpw(passwd, password):
 
-                    if request.data.get('password'):
-                        user_obj.password = request.data.get('password')
-                    if request.data.get('first_name'):
-                        user_obj.first_name = request.data.get('first_name')
-                    if request.data.get('last_name'):
-                        user_obj.first_name = request.data.get('last_name')
-                    user_obj.save()
+                        if request.data.get('password'):
+                            salt = bcrypt.gensalt()
+                            hashed = bcrypt.hashpw(request.data.get('password'), salt)
+                            user_obj.password = hashed
+                        if request.data.get('first_name'):
+                            user_obj.first_name = request.data.get('first_name')
+                        if request.data.get('last_name'):
+                            user_obj.last_name = request.data.get('last_name')
+                        user_obj.account_updated = datetime.now()
+                        user_obj.save()
 
-                    return Response(data={"msg":"User updated"}, status=status.HTTP_200_OK)
-                else:
-                    return Response(data={"error": "Password not authenticated"}, status=status.HTTP_400_BAD_REQUEST)
+                        return Response(status=status.HTTP_204_NO_CONTENT)
+                    else:
+                        return Response(data={"error": "Password not authenticated"}, status=status.HTTP_400_BAD_REQUEST)
+                except:
+                    return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         except models.User.DoesNotExist:
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 

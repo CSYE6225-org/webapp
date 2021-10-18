@@ -62,6 +62,8 @@ class Register(APIView):
               password=hashed)
             return Response(data={"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
+
+class GetUser(APIView):
     @csrf_exempt
     def get(self, request):
         """
@@ -123,16 +125,23 @@ class Register(APIView):
                 try:
                     if bcrypt.checkpw(passwd, password):
 
-                        if request.data.get('password'):
-                            salt = bcrypt.gensalt()
-                            hashed = bcrypt.hashpw(request.data.get('password'), salt)
-                            user_obj.password = hashed
-                        if request.data.get('first_name'):
-                            user_obj.first_name = request.data.get('first_name')
-                        if request.data.get('last_name'):
-                            user_obj.last_name = request.data.get('last_name')
-                        user_obj.account_updated = datetime.now()
-                        user_obj.save()
+                        keys = request.data.keys()
+                        allowed_keys = ['password', 'first_name', 'last_name']
+                        print(keys)
+
+                        if len(set(keys).intersection(set(allowed_keys))) > 0:
+                            if request.data.get('password'):
+                                salt = bcrypt.gensalt()
+                                hashed = bcrypt.hashpw(request.data.get('password'), salt)
+                                user_obj.password = hashed
+                            if request.data.get('first_name'):
+                                user_obj.first_name = request.data.get('first_name')
+                            if request.data.get('last_name'):
+                                user_obj.last_name = request.data.get('last_name')
+                            user_obj.account_updated = datetime.now()
+                            user_obj.save()
+                        else:
+                            return Response(data={"error": "Cannot modify values mentioned"}, status=status.HTTP_400_BAD_REQUEST)
 
                         return Response(status=status.HTTP_204_NO_CONTENT)
                     else:

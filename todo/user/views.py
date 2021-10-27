@@ -217,6 +217,8 @@ class GetProfilePic(APIView):
         auth = request.META['HTTP_AUTHORIZATION'].split()
         str = auth[1].encode("utf-8")
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+        import pdb
+        pdb.set_trace()
 
         try:
             user_obj = models.User.objects.get(username=uname)

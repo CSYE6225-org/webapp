@@ -14,3 +14,9 @@ class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     password = models.CharField(max_length=254, default='')
 
+class Image(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    filename = models.CharField(max_length=254, default='')
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    url = models.CharField(max_length=254, default='')
+    upload_date = models.DateTimeField(auto_now_add=True)

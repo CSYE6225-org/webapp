@@ -7,6 +7,13 @@ from . import models
 from datetime import datetime
 import base64
 
+import os
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+import boto3
+from django.http import Http404
+
 import bcrypt
 
 # Create your views here.
@@ -152,26 +159,98 @@ class GetUser(APIView):
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetProfilePic(APIView):
+    """
+    API for getting and setting profile pic
+    """
+
+    @csrf_exempt
+    def get(self, request):
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+
+        try:
+            user_obj = models.User.objects.get(username=uname)
+            imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+            if imag:
+                jsob = {
+                        "filename": imag[0].id,
+                        "file_name": imag[0].filename,
+                        "url": imag[0].url,
+                        "upload_date": imag[0].upload_date,
+                        "user_id": imag[0].user_id.id
+
+                }
+                return Response(data=jsob, status=status.HTTP_200_OK)
+            else:
+                raise Http404
+        except models.User.DoesNotExist:
+            raise Http404
 
 
+    @csrf_exempt
+    def delete(self, request):
 
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
+        try:
+            user_obj = models.User.objects.get(username=uname)
+            imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+            s3 = boto3.client('s3')
+            s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=imag[0].url)
+            imag.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
+        except models.User.DoesNotExist:
+            raise Http404
 
+    @csrf_exempt
+    def post(self, request):
+        """
+        Post API for updating and setting profile pic
+        """
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
+        try:
+            user_obj = models.User.objects.get(username=uname)
+            if user_obj:
+                #Vallidate Password
+                password = user_obj.password
+                # import pdb
+                # pdb.set_trace()
+                try:
+                    if bcrypt.checkpw(passwd, password):
+                        data = request.FILES['image'] # or self.files['image'] in your form
+                        fp = user_obj.id.urn[9:] + '/' + data.name
+                        path = default_storage.save(fp, ContentFile(data.read()))
+                        tmp_file = os.path.join(settings.MEDIA_ROOT, path)
+                        s3 = boto3.client('s3')
+                        imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+                        if imag:
+                            for i in imag:
+                                s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=i.url)
+                        obj_name = user_obj.id.urn[9:] + '/' + data.name
+                        s3.upload_file(tmp_file, settings.S3_BUCKET_NAME, obj_name)
 
-
-       
-        
-        
-
-
-
-        
-
-
-
-
-
-
-
+                        created_img = models.Image.objects.create(user_id=user_obj, filename=data.name, url=fp)
+                        json_data = {
+                            "id": created_img.id,
+                            "file_name": created_img.filename,
+                            "url": settings.S3_BUCKET_NAME + '/' + created_img.url,
+                            "upload_date": created_img.upload_date,
+                            "user_id": created_img.user_id.id,
+                        }
+                        return Response(data=json_data, status=status.HTTP_200_OK)
+                    else:
+                        return Response(data={"error": "Password not authenticated"}, status=status.HTTP_400_BAD_REQUEST)
+                except:
+                    import traceback
+                    traceback.print_exc()
+                    return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
+        except models.User.DoesNotExist:
+            raise Http404

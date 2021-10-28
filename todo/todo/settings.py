@@ -15,6 +15,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import json
+overrides = json.loads(open('/home/ubuntu/server/config.json').read())
+print(overrides)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -24,6 +27,8 @@ SECRET_KEY = 'django-insecure-rg7fzv(&0w@!0*#ixv9u7&%8_wr(2u*e15+6r51y+r3-tke91$
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+S3_BUCKET_NAME = overrides.get('s3')
 
 ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
 
@@ -76,26 +81,26 @@ WSGI_APPLICATION = 'todo.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'TodoDB',
-        'USER': 'newuser',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost'  
-    }
-}
-
 # DATABASES = {
-#         'default': {
-#                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#                 'NAME': 'csye6225',
-#                 'USER': 'csye6225_a4',
-#                 'PASSWORD': 'Maneesh_1994',
-#                 'HOST': 'csye6225-a4.cgjpuqygwt5e.us-east-1.rds.amazonaws.com',
-#                 'PORT': '5432',
-#         }
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'TodoDB',
+#         'USER': 'newuser',
+#         'PASSWORD': 'postgres',
+#         'HOST': 'localhost'  
+#     }
 # }
+
+DATABASES = {
+        'default': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': overrides.get('database'),
+                'USER': overrides.get('username'),
+                'PASSWORD': overrides.get('password'),
+                'HOST': overrides.get('host').split(':')[0],
+                'PORT': overrides.get('host').split(':')[1],
+        }
+}
 
 
 # Password validation

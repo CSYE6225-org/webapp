@@ -201,6 +201,7 @@ class GetProfilePic(APIView):
             imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
             s3 = boto3.client('s3')
             s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=imag[0].url)
+            imag.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         except models.User.DoesNotExist:
@@ -228,12 +229,15 @@ class GetProfilePic(APIView):
                         fp = user_obj.id.urn[9:] + '/' + data.name
                         path = default_storage.save(fp, ContentFile(data.read()))
                         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
-
                         s3 = boto3.client('s3')
+                        imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+                        if imag:
+                            for i in imag:
+                                s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=i.url)
                         obj_name = user_obj.id.urn[9:] + '/' + data.name
                         s3.upload_file(tmp_file, settings.S3_BUCKET_NAME, obj_name)
 
-                        created_img = models.Image.objects.create(user_id=user_obj, filename=tmp_file, url=fp)
+                        created_img = models.Image.objects.create(user_id=user_obj, filename=data.name, url=fp)
                         json_data = {
                             "id": created_img.id,
                             "file_name": created_img.filename,

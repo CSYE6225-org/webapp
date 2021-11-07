@@ -21,6 +21,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: CD Tests
+      run: |
+        cd todo
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip

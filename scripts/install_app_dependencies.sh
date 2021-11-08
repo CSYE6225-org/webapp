@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/ubunutu/webapp
+cd /home/ubuntu/webapp/todo
 pip install -r requirements.txt

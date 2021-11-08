@@ -30,4 +30,4 @@ jobs:
       id: deploy
       run: |
         echo $(ls)
-        aws deploy create-deployment --application-name webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --s3-location bucket=codedeploy.maneesh,key=webapp.zip,bundleType=zip
+        aws deploy create-deployment --application-name webapp --deployment-config-name CodeDeployDefault.OneAtATime --deployment-group-name csye6225-webapp-deployment --s3-location bucket=codedeploy.maneesh.me,key=webapp.zip,bundleType=zip

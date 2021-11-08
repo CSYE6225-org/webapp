@@ -1,5 +1,4 @@
 import boto3
-
 import sys
 
 def main():
@@ -9,11 +8,11 @@ def main():
     aws_access_secret=sys.argv[4]
     local_path=sys.argv[5]
 
-    #bucket_name="codedeploy.maneesh"
-    #aws_key="weabapp.zip"
-    #aws_access_key="AKIA4FDOUDW65OSZKSOE"
-    #aws_access_secret="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"
-    #local_path="weabapp.zip"
+    # bucket_name="codedeploy.maneesh"
+    # aws_key="weabapp.zip"
+    # aws_access_key="AKIA4FDOUDW65OSZKSOE"
+    # aws_access_secret="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"
+    # local_path="weabapp.zip"
 
     session = boto3.Session(
         aws_access_key_id=aws_access_key,

@@ -12,6 +12,11 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+
+    - name: Check
+      run: |
+        echo $(ls)
+     
     
     - name: Upload file to bucket
       uses: zdurham/s3-upload-github-action@master

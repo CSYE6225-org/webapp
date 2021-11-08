@@ -19,3 +19,19 @@ jobs:
         echo $(ls)
     - name: Release to S3
       run: bash scripts/pipeline/release.sh ${{ secrets.AWS_Bucket_Name }} "webapp.zip" ${{ secrets.AWS_Access_Key }} ${{ secrets.AWS_Access_Secret }} "webapp.zip"
+    
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_Access_Key }}
+        aws-secret-access-key: ${{ secrets.AWS_Access_Secret }}
+        aws-region: us-east-1
+
+    - name: Create CodeDeploy Deployment
+      id: deploy
+      run: |
+        echo $(ls)
+        aws deploy create-deployment \
+        --application-name webapp \ 
+        --deployment-config-name CodeDeployDefault.OneAtATime \ 
+        --deployment-group-name AppDeploymentGroupName \ 
+        --s3-location bucket=codedeploy.maneesh,key=webapp.zip,bundleType=zip

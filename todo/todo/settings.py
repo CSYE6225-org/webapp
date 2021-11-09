@@ -88,6 +88,7 @@ if os.environ.get('USER') == 'maneeshsakthivel':
         'HOST': 'localhost'  
         }
     }
+    
 if os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {

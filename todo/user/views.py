@@ -183,7 +183,7 @@ class GetProfilePic(APIView):
             imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
             if imag:
                 jsob = {
-                        "filename": imag[0].id,
+                        "id": imag[0].id,
                         "file_name": imag[0].filename,
                         "url": imag[0].url,
                         "upload_date": imag[0].upload_date,

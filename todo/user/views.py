@@ -63,10 +63,18 @@ class Register(APIView):
             if user_obj:
                 return Response(data={"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except models.User.DoesNotExist:
-            models.User.objects.create(username=data.get('username'),
+            user_obj.models.User.objects.create(username=data.get('username'),
              first_name=data.get('fname'),
               last_name=data.get('lname'),
               password=hashed)
+            json_data = {
+                        "id": user_obj.id,
+                        "first_name": user_obj.first_name,
+                        "last_name": user_obj.last_name,
+                        "username": user_obj.username,
+                        "account_created": user_obj.account_created,
+                        "account_updated": user_obj.account_updated
+                    }
             return Response(data={"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
 

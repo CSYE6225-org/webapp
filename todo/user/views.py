@@ -15,6 +15,9 @@ import boto3
 from django.http import Http404
 
 import bcrypt
+import logging
+
+logger = logging.getLogger("watchtower")
 
 # Create your views here.
 
@@ -22,6 +25,7 @@ class Register(APIView):
 
     @csrf_exempt
     def post(self, request):
+        logger.info("Maneesh was here request recieved")
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -32,6 +36,7 @@ class Register(APIView):
             "password": request.data["password"],
             "username": request.data["username"],
         }
+
 
         if not data.get('password'):
             return Response(data={"error": "Password cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)

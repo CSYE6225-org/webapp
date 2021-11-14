@@ -24,10 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-rg7fzv(&0w@!0*#ixv9u7&%8_wr(2u*e15+6r51y+r3-tke91$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
+
+
 
 
 # Application definition
@@ -89,7 +91,7 @@ if os.environ.get('USER') == 'maneeshsakthivel':
         }
     }
     
-if os.environ.get('GITHUB_WORKFLOW'):
+elif os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
            'ENGINE': 'django.db.backends.postgresql',
@@ -134,6 +136,84 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+from boto3.session import Session
+# ...
+CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
+CLOUDWATCH_AWS_KEY = "hKPH/Kbd/eucG7CMXaddRdZDp0IDU1qVtYnZ8dOy"
+AWS_DEFAULT_REGION = 'us-east-1' # Be sure to update with your AWS region
+logger_boto3_session = Session(
+    aws_access_key_id=CLOUDWATCH_AWS_ID,
+    aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+    region_name=AWS_DEFAULT_REGION,
+)
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "aws": {
+            "format": "%(asctime)s [%(levelname)-8s] %(message)s [%(pathname)s:%(lineno)d]",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    "handlers": {
+        "watchtower": {
+            "level": "INFO",
+            "class": "watchtower.CloudWatchLogHandler",
+            # From step 2
+            "boto3_session": logger_boto3_session,
+            "log_group": "DemoLogs",
+            # Different stream for each environment
+            "stream_name": f"logs",
+            "formatter": "aws",
+        },
+        "console": {"class": "logging.StreamHandler", "formatter": "aws",},
+    },
+    "loggers": {
+        # Use this logger to send data just to Cloudwatch
+        "watchtower": {"level": "INFO", "handlers": ["watchtower"], "propogate": False,}
+    },
+}
+
+# LOGGING = {
+#     'version': 1,
+#     # Version of logging
+#     'disable_existing_loggers': False,
+ 
+#     'filters':{
+#         #information regarding filters
+#     },
+ 
+#     'formatters':{
+#         'Simple_Format':{
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         }
+#     },
+ 
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'formatter': 'Simple_Format',
+#             'filename': './logs/log_file.log'
+#         },
+ 
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+ 
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file', 'console'],
+#             'level': 'DEBUG',
+#         },
+#     },
+# }
 
 
 # Internationalization

@@ -47,4 +47,4 @@ virtualenv==20.7.2
 virtualenv-clone==0.5.7
 watchtower==2.0.0
 wcwidth==0.2.5
-pystatsd
+django-statsd

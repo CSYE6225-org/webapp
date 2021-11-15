@@ -16,6 +16,7 @@ from django.http import Http404
 
 import bcrypt
 import logging
+import django_statsd
 
 
 logger = logging.getLogger(__name__)
@@ -26,9 +27,7 @@ class Register(APIView):
 
     @csrf_exempt
     def post(self, request):
-        # import pdb
-        # pdb.set_trace()
-        logger.info("Saurabh ROCKZZZZZ")
+        django_statsd.start('timer_post')
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -39,6 +38,8 @@ class Register(APIView):
             "password": request.data["password"],
             "username": request.data["username"],
         }
+
+        django_statsd.stop('timer_post')
 
 
         if not data.get('password'):

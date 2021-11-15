@@ -15,6 +15,18 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from pystatsd import Client, Server
+
+srvr = Server(debug=True)
+srvr.serve()
+
+sc = Client('example.org',8125)
+
+sc.timing('python_test.time',500)
+sc.increment('python_test.inc_int')
+sc.decrement('python_test.decr_int')
+sc.gauge('python_test.gauge', 42)
+
 
 
 # Quick-start development settings - unsuitable for production

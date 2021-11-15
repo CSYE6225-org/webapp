@@ -137,17 +137,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-from boto3.session import Session
-import watchtower
-# ...
-CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
-CLOUDWATCH_AWS_KEY = "hKPH/Kbd/eucG7CMXaddRdZDp0IDU1qVtYnZ8dOy"
-AWS_DEFAULT_REGION = 'us-east-1' # Be sure to update with your AWS region
-logger_boto3_session = Session(
-    aws_access_key_id=CLOUDWATCH_AWS_ID,
-    aws_secret_access_key=CLOUDWATCH_AWS_KEY,
-    region_name=AWS_DEFAULT_REGION,
-)
+# from boto3.session import Session
+# import watchtower
+# # ...
+# CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
+# CLOUDWATCH_AWS_KEY = "hKPH/Kbd/eucG7CMXaddRdZDp0IDU1qVtYnZ8dOy"
+# AWS_DEFAULT_REGION = 'us-east-1' # Be sure to update with your AWS region
+# logger_boto3_session = Session(
+#     aws_access_key_id=CLOUDWATCH_AWS_ID,
+#     aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+#     region_name=AWS_DEFAULT_REGION,
+# )
 
 
 # LOGGING = {

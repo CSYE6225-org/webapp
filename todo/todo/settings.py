@@ -15,17 +15,21 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-from pystatsd import Client, Server
+# from pystatsd import Client, Server
 
-srvr = Server(debug=True)
-srvr.serve()
+# srvr = Server(debug=True)
+# srvr.serve()
 
-sc = Client('example.org',8125)
+# sc = Client('example.org',8125)
 
-sc.timing('python_test.time',500)
-sc.increment('python_test.inc_int')
-sc.decrement('python_test.decr_int')
-sc.gauge('python_test.gauge', 42)
+# sc.timing('python_test.time',500)
+# sc.increment('python_test.inc_int')
+# sc.decrement('python_test.decr_int')
+# sc.gauge('python_test.gauge', 42)
+
+STATSD_HOST = '127.0.0.1'
+STATSD_PORT = 8125
+STATSD_TRACK_MIDDLEWARE = True
 
 
 
@@ -55,10 +59,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'todoapp',
     'rest_framework',
-    'user'
+    'user',
+    'django_statsd'
 ]
 
 MIDDLEWARE = [
+    'django_statsd.middleware.StatsdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_statsd.middleware.StatsdMiddlewareTimer'
 ]
 
 ROOT_URLCONF = 'todo.urls'

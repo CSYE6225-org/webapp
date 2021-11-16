@@ -24,7 +24,6 @@ logger = logging.getLogger(__name__)
 
 
 class Health(APIView):
-
     @csrf_exempt
     def get(self, request):
         return Response(data={},status=status.HTTP_200_OK)

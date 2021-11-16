@@ -34,6 +34,8 @@ class Register(APIView):
     @csrf_exempt
     def post(self, request):
         django_statsd.incr('view_post_user_views_Register_hit')
+        django_statsd.start('timer_Register_overall')
+
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -105,6 +107,7 @@ class GetUser(APIView):
         """
         API for updating user
         """
+        django_statsd.incr('count_get_user_custom')
         django_statsd.start('timer_GetUser_overall')
         #Check the basic auth
         print(request.META.get('HTTP_AUTHORIZATION', " "))
@@ -133,17 +136,18 @@ class GetUser(APIView):
                     django_statsd.stop('timer_GetUser_overall')
                     return Response(data=json_data, status=status.HTTP_200_OK)
                 else:
+                    django_statsd.stop('timer_GetUser_overall')
                     return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         except models.User.DoesNotExist:
+            django_statsd.stop('timer_GetUser_overall')
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data={"message": "User created successfully"}, status=status.HTTP_201_CREATED)
-
+        
     @csrf_exempt
     def put(self, request):
         """
         Edit
         """
+        django_statsd.incr('count_put_user_custom')
         #Check the basic auth
         print(request.META.get('HTTP_AUTHORIZATION', " "))
 
@@ -195,6 +199,7 @@ class GetProfilePic(APIView):
 
     @csrf_exempt
     def get(self, request):
+        django_statsd.incr('count_get_picture_custom')
         auth = request.META['HTTP_AUTHORIZATION'].split()
         str = auth[1].encode("utf-8")
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
@@ -220,7 +225,7 @@ class GetProfilePic(APIView):
 
     @csrf_exempt
     def delete(self, request):
-
+        django_statsd.incr('count_delete_picture_custom')
         auth = request.META['HTTP_AUTHORIZATION'].split()
         str = auth[1].encode("utf-8")
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
@@ -241,6 +246,7 @@ class GetProfilePic(APIView):
         """
         Post API for updating and setting profile pic
         """
+        django_statsd.incr('count_upload_picture_custom')
         auth = request.META['HTTP_AUTHORIZATION'].split()
         str = auth[1].encode("utf-8")
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')

@@ -18,7 +18,6 @@ import bcrypt
 import logging
 import django_statsd
 
-
 logger = logging.getLogger(__name__)
 
 # Create your views here.

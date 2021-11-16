@@ -43,7 +43,9 @@ SECRET_KEY = 'django-insecure-rg7fzv(&0w@!0*#ixv9u7&%8_wr(2u*e15+6r51y+r3-tke91$
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
+# ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
+ALLOWED_HOSTS = ['*']
+
 
 
 

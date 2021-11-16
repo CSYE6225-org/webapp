@@ -33,7 +33,7 @@ class Register(APIView):
 
     @csrf_exempt
     def post(self, request):
-        django_statsd.start('timer_Register_overall')
+        django_statsd.incr('view_post_user_views_Register_hit')
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -48,15 +48,19 @@ class Register(APIView):
 
 
         if not data.get('password'):
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": "Password cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not data.get('fname'):
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": "Frist name cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not data.get('lname'):
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": "Last name cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)
         
         if not data.get('username'):
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": "Username cannor be empty"}, status=status.HTTP_400_BAD_REQUEST)
 
         from django.core.validators import validate_email
@@ -65,6 +69,7 @@ class Register(APIView):
         try:
             validate_email(data.get('username'))
         except ValidationError as e:
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": e}, status=status.HTTP_400_BAD_REQUEST)
 
         #Encrypt password
@@ -75,6 +80,7 @@ class Register(APIView):
         try:
             user_obj = models.User.objects.get(username=data.get('username'))
             if user_obj:
+                django_statsd.stop('timer_Register_overall')
                 return Response(data={"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except models.User.DoesNotExist:
             user_obj = models.User.objects.create(username=data.get('username'),

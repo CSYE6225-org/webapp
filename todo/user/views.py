@@ -27,7 +27,7 @@ class Register(APIView):
 
     @csrf_exempt
     def post(self, request):
-        django_statsd.start('timer_post')
+        django_statsd.start('timer_Register_overall')
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
@@ -39,7 +39,6 @@ class Register(APIView):
             "username": request.data["username"],
         }
 
-        django_statsd.stop('timer_post')
 
 
         if not data.get('password'):
@@ -84,6 +83,7 @@ class Register(APIView):
                         "account_created": user_obj.account_created,
                         "account_updated": user_obj.account_updated
                     }
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"message":json_data}, status=status.HTTP_201_CREATED)
 
 
@@ -93,7 +93,7 @@ class GetUser(APIView):
         """
         API for updating user
         """
-
+        django_statsd.start('timer_GetUser_overall')
         #Check the basic auth
         print(request.META.get('HTTP_AUTHORIZATION', " "))
 
@@ -118,7 +118,7 @@ class GetUser(APIView):
                         "account_created": user_obj.account_created,
                         "account_updated": user_obj.account_updated
                     }
-
+                    django_statsd.stop('timer_GetUser_overall')
                     return Response(data=json_data, status=status.HTTP_200_OK)
                 else:
                     return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)

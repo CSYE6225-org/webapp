@@ -27,8 +27,6 @@ class Health(APIView):
 
     @csrf_exempt
     def get(self, request):
-        import pdb
-        pdb.set_trace()
         return Response(data={},status=status.HTTP_200_OK)
 
 

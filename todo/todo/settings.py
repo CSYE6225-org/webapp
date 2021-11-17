@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATSD_HOST = '127.0.0.1'
 STATSD_PORT = 8125
-STATSD_TRACK_MIDDLEWARE = True
+# STATSD_TRACK_MIDDLEWARE = True
 
 
 
@@ -46,7 +46,7 @@ DEBUG = True
 # ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
 ALLOWED_HOSTS = ['*']
 
-
+STATSD_SAMPLE_RATE = 1
 
 
 

@@ -145,6 +145,8 @@ class GetUser(APIView):
                     django_statsd.stop('timer_GetUser_overall')
                     return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         except models.User.DoesNotExist:
+            
+            django_statsd.stop('timer_GetUser_database_gettimer')
             django_statsd.stop('timer_GetUser_overall')
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
         

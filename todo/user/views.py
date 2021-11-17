@@ -87,6 +87,7 @@ class Register(APIView):
                 django_statsd.stop('timer_Register_overall')
                 return Response(data={"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except models.User.DoesNotExist:
+            django_statsd.stop('timer_Register_database_get_timer')
             django_statsd.start('timer_Register_database_create_timer')
             user_obj = models.User.objects.create(username=data.get('username'),
              first_name=data.get('fname'),

@@ -21,6 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('healthstatus', views.Health.as_view()), 
     path('todos/', include('todoapp.urls')),
-    path('v2/', include('user.urls'))
-
+    path('v1/', include('user.urls'))
 ]

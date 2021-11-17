@@ -22,5 +22,4 @@ urlpatterns = [
     path('healthstatus', views.Health.as_view()), 
     path('todos/', include('todoapp.urls')),
     path('v1/', include('user.urls'))
-
 ]

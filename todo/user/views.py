@@ -107,6 +107,7 @@ class GetUser(APIView):
         """
         API for updating user
         """
+        
         django_statsd.incr('count_get_user_custom')
         django_statsd.start('timer_GetUser_overall')
         #Check the basic auth

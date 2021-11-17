@@ -80,15 +80,19 @@ class Register(APIView):
 
         #Check if user already exists
         try:
+            django_statsd.start('timer_Register_database_get_timer')
             user_obj = models.User.objects.get(username=data.get('username'))
+            django_statsd.stop('timer_Register_database_get_timer')
             if user_obj:
                 django_statsd.stop('timer_Register_overall')
                 return Response(data={"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
         except models.User.DoesNotExist:
+            django_statsd.start('timer_Register_database_create_timer')
             user_obj = models.User.objects.create(username=data.get('username'),
              first_name=data.get('fname'),
               last_name=data.get('lname'),
               password=hashed)
+            django_statsd.stop('timer_Register_database_create_timer')
             json_data = {
                         "id": user_obj.id,
                         "first_name": user_obj.first_name,
@@ -107,7 +111,6 @@ class GetUser(APIView):
         """
         API for updating user
         """
-        
         django_statsd.incr('count_get_user_custom')
         django_statsd.start('timer_GetUser_overall')
         #Check the basic auth
@@ -118,7 +121,9 @@ class GetUser(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
+            django_statsd.start('timer_GetUser_database_gettimer')
             user_obj = models.User.objects.get(username=uname)
+            django_statsd.stop('timer_GetUser_database_gettimer')
             if user_obj:
                 #Vallidate Password
                 password = user_obj.password
@@ -180,7 +185,9 @@ class GetUser(APIView):
                             if request.data.get('last_name'):
                                 user_obj.last_name = request.data.get('last_name')
                             user_obj.account_updated = datetime.now()
+                            django_statsd.start('timer_GetUser_database_savetimer')
                             user_obj.save()
+                            django_statsd.stop('timer_GetUser_database_savetimer')
                         else:
                             return Response(data={"error": "Cannot modify values mentioned"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -235,7 +242,9 @@ class GetProfilePic(APIView):
             user_obj = models.User.objects.get(username=uname)
             imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
             s3 = boto3.client('s3')
+            django_statsd.start('timer_DeletePic_s3_deletetimer')
             s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=imag[0].url)
+            django_statsd.stop('timer_DeletePic_s3_deletetimer')
             imag.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -271,8 +280,9 @@ class GetProfilePic(APIView):
                             for i in imag:
                                 s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=i.url)
                         obj_name = user_obj.id.urn[9:] + '/' + data.name
+                        django_statsd.start('timer_UploadPic_s3_uploadtimer')
                         s3.upload_file(tmp_file, settings.S3_BUCKET_NAME, obj_name)
-
+                        django_statsd.stop('timer_UploadPic_s3_uploadtimer')
                         created_img = models.Image.objects.create(user_id=user_obj, filename=data.name, url=fp)
                         json_data = {
                             "id": created_img.id,

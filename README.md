@@ -8,7 +8,6 @@ Prerequisites:
 4. Bcrypt
 
 How to setup?
-
 1. Start postgres server with the following command: brew services start postgresql
 2. Make the DB connection by running the following commands:
     python manage.py makemigrations

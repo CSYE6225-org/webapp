@@ -165,7 +165,7 @@ class GetUser(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
-            user_obj = models.User.objects.using('replica').get(username=uname)
+            user_obj = models.User.objects.get(username=uname)
             if user_obj:
                 #Vallidate Password
                 password = user_obj.password

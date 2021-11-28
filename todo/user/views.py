@@ -81,7 +81,7 @@ class Register(APIView):
         #Check if user already exists
         try:
             django_statsd.start('timer_Register_database_get_timer')
-            user_obj = models.User.objects.get(username=data.get('username'))
+            user_obj = models.User.objects.using('replica').get(username=data.get('username'))
             django_statsd.stop('timer_Register_database_get_timer')
             if user_obj:
                 django_statsd.stop('timer_Register_overall')
@@ -123,7 +123,7 @@ class GetUser(APIView):
 
         try:
             django_statsd.start('timer_GetUser_database_gettimer')
-            user_obj = models.User.objects.get(username=uname)
+            user_obj = models.User.objects.using('replica').get(username=uname)
             django_statsd.stop('timer_GetUser_database_gettimer')
             if user_obj:
                 #Vallidate Password
@@ -165,7 +165,7 @@ class GetUser(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
-            user_obj = models.User.objects.get(username=uname)
+            user_obj = models.User.objects.using('replica').get(username=uname)
             if user_obj:
                 #Vallidate Password
                 password = user_obj.password
@@ -216,8 +216,8 @@ class GetProfilePic(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
-            user_obj = models.User.objects.get(username=uname)
-            imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+            user_obj = models.User.objects.using('replica').get(username=uname)
+            imag = models.Image.objects.using('replica').filter(user_id=user_obj).order_by('-upload_date')
             if imag:
                 jsob = {
                         "id": imag[0].id,
@@ -242,8 +242,8 @@ class GetProfilePic(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
-            user_obj = models.User.objects.get(username=uname)
-            imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+            user_obj = models.User.objects.using('replica').get(username=uname)
+            imag = models.Image.objects.using('replica').filter(user_id=user_obj).order_by('-upload_date')
             s3 = boto3.client('s3')
             django_statsd.start('timer_DeletePic_s3_deletetimer')
             s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=imag[0].url)
@@ -265,7 +265,7 @@ class GetProfilePic(APIView):
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
 
         try:
-            user_obj = models.User.objects.get(username=uname)
+            user_obj = models.User.objects.using('replica').get(username=uname)
             if user_obj:
                 #Vallidate Password
                 password = user_obj.password
@@ -278,7 +278,7 @@ class GetProfilePic(APIView):
                         path = default_storage.save(fp, ContentFile(data.read()))
                         tmp_file = os.path.join(settings.MEDIA_ROOT, path)
                         s3 = boto3.client('s3')
-                        imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
+                        imag = models.Image.objects.using('replica').filter(user_id=user_obj).order_by('-upload_date')
                         if imag:
                             for i in imag:
                                 s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=i.url)

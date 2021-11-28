@@ -243,7 +243,7 @@ class GetProfilePic(APIView):
 
         try:
             user_obj = models.User.objects.using('replica').get(username=uname)
-            imag = models.Image.objects.using('replica').filter(user_id=user_obj).order_by('-upload_date')
+            imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
             s3 = boto3.client('s3')
             django_statsd.start('timer_DeletePic_s3_deletetimer')
             s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=imag[0].url)

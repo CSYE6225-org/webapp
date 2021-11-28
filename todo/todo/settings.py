@@ -136,6 +136,14 @@ else:
                 'PASSWORD': overrides.get('password'),
                 'HOST': overrides.get('host').split(':')[0],
                 'PORT': overrides.get('host').split(':')[1],
+        },
+        'replica': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': overrides.get('database'),
+            'USER': overrides.get('username'),
+            'PASSWORD': overrides.get('password'),
+            'HOST': overrides.get('replica'),
+            'PORT': overrides.get('host').split(':')[1],
         }
     }
 

@@ -142,7 +142,7 @@ else:
             'NAME': overrides.get('database'),
             'USER': overrides.get('username'),
             'PASSWORD': overrides.get('password'),
-            'HOST': overrides.get('replica'),
+            'HOST': overrides.get('replica').split(':')[0],
             'PORT': overrides.get('host').split(':')[1],
         }
     }

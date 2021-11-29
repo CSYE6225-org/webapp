@@ -94,6 +94,30 @@ class Register(APIView):
               last_name=data.get('lname'),
               password=hashed)
             django_statsd.stop('timer_Register_database_create_timer')
+            AWS_ACCESS_KEY_ID = "AKIAZ7SWXZPJKXRK2VUL"
+            AWS_SECRET_ACCESS_KEY = "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"
+            AWS_REGION_NAME = "us-east-1"
+            client = boto3.client(
+                "sns",
+                aws_access_key_id=AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                region_name=AWS_REGION_NAME
+            )
+                        
+            response = client.publish(
+
+                TopicArn="arn:aws:sns:us-east-1:686302940114:EmailNotificationRecipeEndpoint",
+                Message=SMS_MESSAGE,
+                EmailAddress=user_obj.username,
+                MessageType="text",
+                AccessToken="asdasdasdasd",
+                MessageAttributes={
+                'string': {
+                    'DataType': 'String',
+                    'StringValue': 'String',
+                 }
+                }
+            )
             json_data = {
                         "id": user_obj.id,
                         "first_name": user_obj.first_name,
@@ -102,6 +126,8 @@ class Register(APIView):
                         "account_created": user_obj.account_created,
                         "account_updated": user_obj.account_updated
                     }
+
+            
             django_statsd.stop('timer_Register_overall')
             return Response(data={"message":json_data}, status=status.HTTP_201_CREATED)
 

@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
@@ -103,13 +104,18 @@ class Register(APIView):
                 aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                 region_name=AWS_REGION_NAME
             )
+
+            dic = {"EmailAddress":user_obj.username,
+                "MessageType":"text",
+                "AccessToken":"asdasdasdasd",
+            }
+
                         
             response = client.publish(
 
                 TopicArn="arn:aws:sns:us-east-1:686302940114:EmailNotificationRecipeEndpoint",
-                EmailAddress=user_obj.username,
-                MessageType="text",
-                AccessToken="asdasdasdasd",
+                Message=json.dumps(dic),
+                
                 MessageAttributes={
                 'string': {
                     'DataType': 'String',

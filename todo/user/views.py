@@ -18,6 +18,8 @@ from django.http import Http404
 import bcrypt
 import logging
 import django_statsd
+import time
+import secrets
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +100,31 @@ class Register(APIView):
             AWS_ACCESS_KEY_ID = "AKIAZ7SWXZPJKXRK2VUL"
             AWS_SECRET_ACCESS_KEY = "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"
             AWS_REGION_NAME = "us-east-1"
+
+            dynamodbClient = boto3.client(
+                'dynamodb',
+                aws_access_key_id=AWS_ACCESS_KEY_ID, 
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                region_name=AWS_REGION_NAME)
+            
+            expiryTimestamp = int(time.time() + 120)
+            token = secrets.token_hex(16)
+            dynamodbClient.put_item(
+                TableName = 'csye6225-dynamo',
+                Item = {
+                    'id': {
+                        'S': user_obj.username
+                    },
+                    'token': {
+                        'S': token
+                    },
+                    'TimeToExist': {
+                        'N': str(expiryTimestamp) 
+                    }
+                }
+            )
+            
+
             client = boto3.client(
                 "sns",
                 aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -105,9 +132,10 @@ class Register(APIView):
                 region_name=AWS_REGION_NAME
             )
 
-            dic = {"EmailAddress":user_obj.username,
+            dic = {
+                "EmailAddress":user_obj.username,
                 "MessageType":"text",
-                "AccessToken":"asdasdasdasd",
+                "AccessToken":token,
             }
 
                         

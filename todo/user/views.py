@@ -107,7 +107,6 @@ class Register(APIView):
             response = client.publish(
 
                 TopicArn="arn:aws:sns:us-east-1:686302940114:EmailNotificationRecipeEndpoint",
-                Message=SMS_MESSAGE,
                 EmailAddress=user_obj.username,
                 MessageType="text",
                 AccessToken="asdasdasdasd",

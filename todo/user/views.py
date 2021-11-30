@@ -185,7 +185,8 @@ class GetUser(APIView):
             django_statsd.stop('timer_GetUser_database_gettimer')
 
             if user_obj:
-                if user_obj.verified == True:
+                if user_obj.verified == False:
+                    django_statsd.stop('timer_GetUser_overall')
                     return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
                 #Vallidate Password
                 password = user_obj.password

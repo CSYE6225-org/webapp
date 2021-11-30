@@ -96,6 +96,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'todo.wsgi.application'
+AWS_ACCESS_KEY_ID = "AKIAZ7SWXZPJKXRK2VUL"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_REGION_NAME = "us-east-1"
 
 
 # Database
@@ -109,12 +112,27 @@ if os.environ.get('USER') == 'maneeshsakthivel':
         'USER': 'newuser',
         'PASSWORD': 'postgres',
         'HOST': 'localhost'  
+        },
+    'replica': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'TodoDB',
+        'USER': 'newuser',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost'  
         }
     }
     
 elif os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'github_actions',
+           'USER': 'postgres',
+           'PASSWORD': 'postgres',
+           'HOST': '127.0.0.1',
+           'PORT': '5432',
+        },
+        'replica': {
            'ENGINE': 'django.db.backends.postgresql',
            'NAME': 'github_actions',
            'USER': 'postgres',

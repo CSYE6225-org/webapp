@@ -38,9 +38,11 @@ class Register(APIView):
     def post(self, request):
         django_statsd.incr('view_post_user_views_Register_hit')
         django_statsd.start('timer_Register_overall')
+        
 
         #TODO Add validation for email addresses
         if 'first_name' not in request.data or 'last_name' not in request.data or 'password' not in request.data or 'username' not in request.data:
+            django_statsd.stop('timer_Register_overall')
             return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
         
         data = {
@@ -97,15 +99,12 @@ class Register(APIView):
               last_name=data.get('lname'),
               password=hashed)
             django_statsd.stop('timer_Register_database_create_timer')
-            AWS_ACCESS_KEY_ID = "AKIAZ7SWXZPJKXRK2VUL"
-            AWS_SECRET_ACCESS_KEY = "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"
-            AWS_REGION_NAME = "us-east-1"
 
             dynamodbClient = boto3.client(
                 'dynamodb',
-                aws_access_key_id=AWS_ACCESS_KEY_ID, 
-                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                region_name=AWS_REGION_NAME)
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID, 
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_REGION_NAME)
             
             expiryTimestamp = int(time.time() + 120)
             token = secrets.token_hex(16)
@@ -127,9 +126,9 @@ class Register(APIView):
 
             client = boto3.client(
                 "sns",
-                aws_access_key_id=AWS_ACCESS_KEY_ID,
-                aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                region_name=AWS_REGION_NAME
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_REGION_NAME
             )
 
             dic = {
@@ -184,7 +183,10 @@ class GetUser(APIView):
             django_statsd.start('timer_GetUser_database_gettimer')
             user_obj = models.User.objects.using('replica').get(username=uname)
             django_statsd.stop('timer_GetUser_database_gettimer')
+
             if user_obj:
+                if user_obj.verified == True:
+                    return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
                 #Vallidate Password
                 password = user_obj.password
                 # import pdb
@@ -362,3 +364,56 @@ class GetProfilePic(APIView):
                     return Response(data={"error": "Password not authenticated"}, status=status.HTTP_403_FORBIDDEN)
         except models.User.DoesNotExist:
             raise Http404
+
+
+class VerifyUser(APIView):
+    @csrf_exempt
+    def get(self, request):
+        """
+        API for validating user
+        """
+        if 'token' not in request.GET and 'email' not in request.GET:
+            return Response(data={"error": "Mandatory fields are missing"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        token = request.GET.get('token')
+        email = request.GET.get('email')
+        
+        epochTimeNow = int(time.time())
+        dynamodbClient = boto3.client(
+                'dynamodb',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID, 
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_REGION_NAME)
+        try:
+            res = dynamodbClient.query(
+                TableName = 'csye6225-dynamo',
+                KeyConditionExpression = '#id = :id',
+                FilterExpression = '#t > :TimeToExist',
+                ExpressionAttributeNames = {
+                    '#t': 'TimeToExist',
+                    '#id': 'id'
+                },
+                ExpressionAttributeValues = {
+                    ':TimeToExist': {
+                        'N': str(epochTimeNow),
+                    },
+                    ':id': {
+                        'S': email
+                    },
+                }
+            )
+        except Exception as e:
+            print('Exception: ', e)
+
+        if res['Count'] >= 1:
+            if res['Items'][0]['token'] == token:
+                try:
+                    user_obj = models.User.objects.get(username=email)
+                    user_obj.verified = True
+                    user_obj.verified = datetime.now()
+                    user_obj.save()
+                except models.User.DoesNotExist:
+                    return Response(data={"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+                
+
+

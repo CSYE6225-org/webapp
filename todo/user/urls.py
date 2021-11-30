@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path('user/', views.Register.as_view()),
     path('user/self', views.GetUser.as_view()),
+    path('verifyUserEmail', views.VerifyUser.as_view()),
     path('user/self/pic', views.GetProfilePic.as_view()),
 
 ]

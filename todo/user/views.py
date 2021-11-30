@@ -406,14 +406,17 @@ class VerifyUser(APIView):
             print('Exception: ', e)
 
         if res['Count'] >= 1:
-            if res['Items'][0]['token'] == token:
+            if res['Items'][0]['token']['S'] == token:
                 try:
                     user_obj = models.User.objects.get(username=email)
                     user_obj.verified = True
-                    user_obj.verified = datetime.now()
+                    user_obj.verified_on = datetime.now()
                     user_obj.save()
+                    return Response(data={'message':"Verifed"}, status=status.HTTP_200_OK)
                 except models.User.DoesNotExist:
                     return Response(data={"error": "User does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(data={"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
                 
 
 

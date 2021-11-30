@@ -156,7 +156,8 @@ class Register(APIView):
                         "last_name": user_obj.last_name,
                         "username": user_obj.username,
                         "account_created": user_obj.account_created,
-                        "account_updated": user_obj.account_updated
+                        "account_updated": user_obj.account_updated,
+                        "verified": user_obj.verified
                     }
 
             
@@ -200,7 +201,9 @@ class GetUser(APIView):
                         "last_name": user_obj.last_name,
                         "username": user_obj.username,
                         "account_created": user_obj.account_created,
-                        "account_updated": user_obj.account_updated
+                        "account_updated": user_obj.account_updated,
+                        "verified": user_obj.verified,
+                        "verified_on": user_obj.verified_on
                     }
                     django_statsd.stop('timer_GetUser_overall')
                     return Response(data=json_data, status=status.HTTP_200_OK)
@@ -229,6 +232,8 @@ class GetUser(APIView):
         try:
             user_obj = models.User.objects.get(username=uname)
             if user_obj:
+                if user_obj.verified == False:
+                    return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
                 #Vallidate Password
                 password = user_obj.password
                 # import pdb
@@ -279,6 +284,8 @@ class GetProfilePic(APIView):
 
         try:
             user_obj = models.User.objects.using('replica').get(username=uname)
+            if user_obj.verified == False:
+                return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
             imag = models.Image.objects.using('replica').filter(user_id=user_obj).order_by('-upload_date')
             if imag:
                 jsob = {
@@ -305,6 +312,8 @@ class GetProfilePic(APIView):
 
         try:
             user_obj = models.User.objects.using('replica').get(username=uname)
+            if user_obj.verified == False:
+                return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
             imag = models.Image.objects.filter(user_id=user_obj).order_by('-upload_date')
             s3 = boto3.client('s3')
             django_statsd.start('timer_DeletePic_s3_deletetimer')
@@ -329,6 +338,8 @@ class GetProfilePic(APIView):
         try:
             user_obj = models.User.objects.using('replica').get(username=uname)
             if user_obj:
+                if user_obj.verified == False:
+                    return Response(data={"error": "User not verified"}, status=status.HTTP_403_FORBIDDEN)
                 #Vallidate Password
                 password = user_obj.password
                 # import pdb

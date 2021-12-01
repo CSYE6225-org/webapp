@@ -106,7 +106,7 @@ class Register(APIView):
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 region_name=settings.AWS_REGION_NAME)
             
-            expiryTimestamp = int(time.time() + 120)
+            expiryTimestamp = int(time.time() + 300)
             token = secrets.token_hex(16)
             dynamodbClient.put_item(
                 TableName = 'csye6225-dynamo',
@@ -157,7 +157,8 @@ class Register(APIView):
                         "username": user_obj.username,
                         "account_created": user_obj.account_created,
                         "account_updated": user_obj.account_updated,
-                        "verified": user_obj.verified
+                        "verified": user_obj.verified,
+                        "verified_on": user_obj.verified_on
                     }
 
             

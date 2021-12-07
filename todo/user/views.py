@@ -109,7 +109,7 @@ class Register(APIView):
             expiryTimestamp = int(time.time() + 300)
             token = secrets.token_hex(16)
             dynamodbClient.put_item(
-                TableName = 'csye6225-dynamo',
+                TableName = 'dynamodb',
                 Item = {
                     'id': {
                         'S': user_obj.username
@@ -399,7 +399,7 @@ class VerifyUser(APIView):
                 region_name=settings.AWS_REGION_NAME)
         try:
             res = dynamodbClient.query(
-                TableName = 'csye6225-dynamo',
+                TableName = 'dynamodb',
                 KeyConditionExpression = '#id = :id',
                 FilterExpression = '#t > :TimeToExist',
                 ExpressionAttributeNames = {

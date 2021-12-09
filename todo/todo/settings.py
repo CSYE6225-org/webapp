@@ -162,9 +162,11 @@ else:
                 'NAME': overrides.get('database'),
                 'USER': overrides.get('username'),
                 'PASSWORD': overrides.get('password'),
-                'HOST': overrides.get('host').split(':')[0]+"?sslmode=require",
+                'HOST': overrides.get('host').split(':')[0],
                 'PORT': overrides.get('host').split(':')[1],
-                'OPTIONS': {'sslmode': 'require'},
+               'OPTIONS':  {
+                    'ssl': {'ssl-ca': 'us-east-1-bundle.pem'}
+                    }
         }
     }
 

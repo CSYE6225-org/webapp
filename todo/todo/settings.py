@@ -15,6 +15,16 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from boto3.session import Session
+# ...
+CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
+CLOUDWATCH_AWS_KEY = "hKPH/Kbd/eucG7CMXaddRdZDp0IDU1qVtYnZ8dOy"
+AWS_DEFAULT_REGION = 'us-west-2' # Be sure to update with your AWS region
+logger_boto3_session = Session(
+    aws_access_key_id=CLOUDWATCH_AWS_ID,
+    aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+    region_name=AWS_DEFAULT_REGION,
+)
 # from pystatsd import Client, Server
 
 # srvr = Server(debug=True)
@@ -152,16 +162,9 @@ else:
                 'NAME': overrides.get('database'),
                 'USER': overrides.get('username'),
                 'PASSWORD': overrides.get('password'),
-                'HOST': overrides.get('host').split(':')[0],
+                'HOST': overrides.get('host').split(':')[0]+"?sslmode=require",
                 'PORT': overrides.get('host').split(':')[1],
-        },
-        'replica': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': overrides.get('database'),
-            'USER': overrides.get('username'),
-            'PASSWORD': overrides.get('password'),
-            'HOST': overrides.get('replica').split(':')[0],
-            'PORT': overrides.get('host').split(':')[1],
+                'OPTIONS': {'sslmode': 'require'},
         }
     }
 

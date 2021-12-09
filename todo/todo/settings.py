@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-<<<<<<< HEAD
 from boto3.session import Session
 # ...
 CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
@@ -26,7 +25,6 @@ logger_boto3_session = Session(
     aws_secret_access_key=CLOUDWATCH_AWS_KEY,
     region_name=AWS_DEFAULT_REGION,
 )
-=======
 # from pystatsd import Client, Server
 
 # srvr = Server(debug=True)
@@ -42,7 +40,6 @@ logger_boto3_session = Session(
 STATSD_HOST = '127.0.0.1'
 STATSD_PORT = 8125
 # STATSD_TRACK_MIDDLEWARE = True
->>>>>>> 71ead52363eff065bc74935531927fa358244ef4
 
 
 

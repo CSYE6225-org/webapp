@@ -165,11 +165,22 @@ else:
                 'HOST': overrides.get('host').split(':')[0],
                 'PORT': overrides.get('host').split(':')[1],
                 'OPTIONS': {
-            'sslmode': 'require',
-            'sslcert': 'us-east-1-bundle.pem',
+                    'sslmode': 'require',
+                    'sslcert': 'us-east-1-bundle.pem',
                 }
-    
-        }
+        },
+        'replica': {
+                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                'NAME': overrides.get('database'),
+                'USER': overrides.get('username'),
+                'PASSWORD': overrides.get('password'),
+                'HOST': overrides.get('host').split(':')[0],
+                'PORT': overrides.get('host').split(':')[1],
+                'OPTIONS': {
+                    'sslmode': 'require',
+                    'sslcert': 'us-east-1-bundle.pem',
+                }
+        },   
     }
 
 

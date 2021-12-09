@@ -164,9 +164,11 @@ else:
                 'PASSWORD': overrides.get('password'),
                 'HOST': overrides.get('host').split(':')[0],
                 'PORT': overrides.get('host').split(':')[1],
-               'OPTIONS':  {
-                    'ssl': {'ssl-ca': 'us-east-1-bundle.pem'}
-                    }
+                'OPTIONS': {
+            'sslmode': 'require',
+            'sslcert': 'us-east-1-bundle.pem',
+                }
+    
         }
     }
 

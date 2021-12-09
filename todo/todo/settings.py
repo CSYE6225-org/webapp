@@ -15,6 +15,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+<<<<<<< HEAD
 from boto3.session import Session
 # ...
 CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
@@ -25,6 +26,23 @@ logger_boto3_session = Session(
     aws_secret_access_key=CLOUDWATCH_AWS_KEY,
     region_name=AWS_DEFAULT_REGION,
 )
+=======
+# from pystatsd import Client, Server
+
+# srvr = Server(debug=True)
+# srvr.serve()
+
+# sc = Client('example.org',8125)
+
+# sc.timing('python_test.time',500)
+# sc.increment('python_test.inc_int')
+# sc.decrement('python_test.decr_int')
+# sc.gauge('python_test.gauge', 42)
+
+STATSD_HOST = '127.0.0.1'
+STATSD_PORT = 8125
+# STATSD_TRACK_MIDDLEWARE = True
+>>>>>>> 71ead52363eff065bc74935531927fa358244ef4
 
 
 
@@ -38,7 +56,11 @@ SECRET_KEY = 'django-insecure-rg7fzv(&0w@!0*#ixv9u7&%8_wr(2u*e15+6r51y+r3-tke91$
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
+# ALLOWED_HOSTS = ['127.0.0.1', 'dev.maneesh.me', 'prod.maneesh.me']
+ALLOWED_HOSTS = ['*']
+
+STATSD_SAMPLE_RATE = 1
+
 
 
 # Application definition
@@ -52,10 +74,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'todoapp',
     'rest_framework',
-    'user'
+    'user',
+    'django_statsd'
 ]
 
 MIDDLEWARE = [
+    'django_statsd.middleware.StatsdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,6 +87,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_statsd.middleware.StatsdMiddlewareTimer'
 ]
 
 ROOT_URLCONF = 'todo.urls'
@@ -84,6 +109,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'todo.wsgi.application'
+AWS_ACCESS_KEY_ID = "AKIAZ7SWXZPJKXRK2VUL"
+AWS_SECRET_ACCESS_KEY = "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"
+AWS_REGION_NAME = "us-east-1"
 
 
 # Database
@@ -97,12 +125,27 @@ if os.environ.get('USER') == 'maneeshsakthivel':
         'USER': 'newuser',
         'PASSWORD': 'postgres',
         'HOST': 'localhost'  
+        },
+    'replica': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'TodoDB',
+        'USER': 'newuser',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost'  
         }
     }
     
-if os.environ.get('GITHUB_WORKFLOW'):
+elif os.environ.get('GITHUB_WORKFLOW'):
     DATABASES = {
         'default': {
+           'ENGINE': 'django.db.backends.postgresql',
+           'NAME': 'github_actions',
+           'USER': 'postgres',
+           'PASSWORD': 'postgres',
+           'HOST': '127.0.0.1',
+           'PORT': '5432',
+        },
+        'replica': {
            'ENGINE': 'django.db.backends.postgresql',
            'NAME': 'github_actions',
            'USER': 'postgres',
@@ -147,6 +190,85 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# from boto3.session import Session
+# import watchtower
+# # ...
+# CLOUDWATCH_AWS_ID = "AKIAZ7SWXZPJKXRK2VUL"
+# CLOUDWATCH_AWS_KEY = "hKPH/Kbd/eucG7CMXaddRdZDp0IDU1qVtYnZ8dOy"
+# AWS_DEFAULT_REGION = 'us-east-1' # Be sure to update with your AWS region
+# logger_boto3_session = Session(
+#     aws_access_key_id=CLOUDWATCH_AWS_ID,
+#     aws_secret_access_key=CLOUDWATCH_AWS_KEY,
+#     region_name=AWS_DEFAULT_REGION,
+# )
+
+
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "formatters": {
+#         "aws": {
+#             "format": "%(asctime)s [%(levelname)-8s] %(message)s [%(pathname)s:%(lineno)d]",
+#             "datefmt": "%Y-%m-%d %H:%M:%S",
+#         },
+#     },
+#     "handlers": {
+#         "watchtower": {
+#             "level": "INFO",
+#             "class": "watchtower.CloudWatchLogHandler",
+#             # From step 2
+#             "boto3_session": logger_boto3_session,
+#             "log_group": "csye6225",
+#             # Different stream for each environment
+#             "stream_name": "webapp",
+#             "formatter": "aws",
+#         },
+#         "console": {"class": "logging.StreamHandler", "formatter": "aws",},
+#     },
+#     "loggers": {
+#         # Use this logger to send data just to Cloudwatch
+#         "watchtower": {"level": "INFO", "handlers": ["watchtower"], "propogate": False,}
+#     },
+# }
+
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
+ 
+    'filters':{
+        #information regarding filters
+    },
+ 
+    'formatters':{
+        'Simple_Format':{
+            'format': '{levelname} {message}',
+            'style': '{',
+        }
+    },
+ 
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'Simple_Format',
+            'filename': './logs/log_file.log'
+        },
+ 
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+ 
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
+    },
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -181,5 +303,5 @@ REST_FRAMEWORK = {
 import os
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-AWS_ACCESS_KEY_ID = "AKIA4FDOUDW65OSZKSOE"
-AWS_SECRET_ACCESS_KEY = "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"
+# AWS_ACCESS_KEY_ID = "AKIA4FDOUDW65OSZKSOE"
+# AWS_SECRET_ACCESS_KEY = "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"

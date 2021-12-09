@@ -13,6 +13,8 @@ class User(models.Model):
     account_updated = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     password = models.CharField(max_length=254, default='')
+    verified = models.BooleanField(default=False)
+    verified_on = models.DateTimeField(auto_now_add=True)
 
 class Image(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -243,43 +243,43 @@ AUTH_PASSWORD_VALIDATORS = [
 #     },
 # }
 
-# LOGGING = {
-#     'version': 1,
-#     # Version of logging
-#     'disable_existing_loggers': False,
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
  
-#     'filters':{
-#         #information regarding filters
-#     },
+    'filters':{
+        #information regarding filters
+    },
  
-#     'formatters':{
-#         'Simple_Format':{
-#             'format': '{levelname} {message}',
-#             'style': '{',
-#         }
-#     },
+    'formatters':{
+        'Simple_Format':{
+            'format': '{levelname} {message}',
+            'style': '{',
+        }
+    },
  
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'formatter': 'Simple_Format',
-#             'filename': './logs/log_file.log'
-#         },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'Simple_Format',
+            'filename': './logs/log_file.log'
+        },
  
-#         'console': {
-#             'level': 'DEBUG',
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
  
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file', 'console'],
-#             'level': 'DEBUG',
-#         },
-#     },
-# }
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 
 
 # Internationalization

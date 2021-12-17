@@ -31,6 +31,34 @@ class Health(APIView):
     def get(self, request):
         return Response(data={},status=status.HTTP_200_OK)
 
+class DoctorsList(APIView):
+    @csrf_exempt
+    def get(self, request):
+        return Response(data={
+            "docs": [
+                {
+                    "name": "Dr Pal, Gynacologist",
+                    "address": "32 Chase Street, Quincy"
+                },
+                {
+                    "name": "Dr Brooks, Pediatrician",
+                    "address": "32 Chase Street, Waltham"
+                },
+                {
+                    "name": "Dr Jack, Neurologist",
+                    "address": "32 Chase Street, Quincy"
+                },
+                {
+                    "name": "Dr Ram, Radiologist",
+                    "address": "32 Chase Street, Quincy"
+                },
+                {
+                    "name": "Dr Pooja, Cardiologist",
+                    "address": "32 Chase Street, Quincy"
+                },
+            ]
+        },status=status.HTTP_200_OK)
+
 
 class Register(APIView):
 

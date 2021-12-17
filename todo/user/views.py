@@ -40,7 +40,7 @@ class CreateApplication(APIView):
             apt_time = request.data["apt_time"]
 
             models.Appoinments.objects.create(
-                user=user_obj,
+                user_id=user_obj,
                 doc_name=doc_name,
                 apt_time=apt_time
             )

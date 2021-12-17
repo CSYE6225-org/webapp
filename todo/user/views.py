@@ -25,6 +25,31 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+class CreateApplication(APIView):
+    @csrf_exempt
+    def post(self, request):
+        print(request.META.get('HTTP_AUTHORIZATION', " "))
+
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+
+        try:
+            user_obj = models.User.objects.using('replica').get(username=uname)
+            doc_name = request.data["doc_name"]
+            apt_time = request.data["apt_time"]
+
+            models.Appoinments.objects.create(
+                user=user_obj,
+                doc_name=doc_name,
+                apt_time=apt_time
+            )
+            return Response(data={"message": "Sucessfully scheduled"},status=status.HTTP_200_OK)
+
+        except models.User.DoesNotExist:
+            return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class Health(APIView):
     @csrf_exempt

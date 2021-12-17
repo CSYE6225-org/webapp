@@ -22,3 +22,9 @@ class Image(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE)
     url = models.CharField(max_length=254, default='')
     upload_date = models.DateTimeField(auto_now_add=True)
+
+class Appoinments(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    doc_name = models.CharField(max_length=254, default='')
+    apt_time = models.CharField(max_length=254, default='')

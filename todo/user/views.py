@@ -49,6 +49,21 @@ class CreateApplication(APIView):
         except models.User.DoesNotExist:
             return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
+    @csrf_exempt
+    def get(self, request):
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+        user_obj = models.User.objects.using('replica').get(username=uname)
+        appts = models.Appoinments.objects.filter(user_id=user_obj)
+        res = {"appts": []}
+        for ap in appts:
+            new_apt = {"doc_name": ap.doc_name, "apt_time": ap.apt_time}
+            res['appts'].append(new_apt)
+
+
+        return Response(data=res,status=status.HTTP_200_OK)
+
 
 
 class Health(APIView):

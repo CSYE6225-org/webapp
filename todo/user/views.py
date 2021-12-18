@@ -59,7 +59,7 @@ class FavDoctors(APIView):
         res = {"docs": []}
         for ap in appts:
             new_apt = {"doc_name": ap.doc_name, "address": ap.address}
-            res['appts'].append(new_apt)
+            res['docs'].append(new_apt)
 
 
         return Response(data=res,status=status.HTTP_200_OK)

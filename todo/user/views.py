@@ -51,14 +51,18 @@ class FavDoctors(APIView):
 
     @csrf_exempt
     def get(self, request):
+        from random import randrange
         auth = request.META['HTTP_AUTHORIZATION'].split()
         str = auth[1].encode("utf-8")
         uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
         user_obj = models.User.objects.using('replica').get(username=uname)
         appts = models.MyDoctors.objects.filter(user_id=user_obj)
         res = {"docs": []}
+        arr_specs = ["Gastroenterology", "General Surgery", "Neurology", "Pulmonary Disease"]
         for ap in appts:
-            new_apt = {"doc_name": ap.doc_name, "address": ap.address}
+            new_apt = {"doc_name": ap.doc_name,
+            "specality": arr_specs[randrange(4)],
+            "address": ap.address}
             res['docs'].append(new_apt)
 
 

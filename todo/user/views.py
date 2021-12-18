@@ -25,6 +25,46 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+class FavDoctors(APIView):
+    @csrf_exempt
+    def post(self, request):
+        print(request.META.get('HTTP_AUTHORIZATION', " "))
+
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+
+        try:
+            user_obj = models.User.objects.using('replica').get(username=uname)
+            doc_name = request.data["doc_name"]
+            address = request.data["address"]
+
+            models.MyDoctors.objects.create(
+                user_id=user_obj,
+                doc_name=doc_name,
+                address=address
+            )
+            return Response(data={"message": "Sucessfully Added"},status=status.HTTP_200_OK)
+
+        except models.User.DoesNotExist:
+            return Response(data={"error": "Username does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @csrf_exempt
+    def get(self, request):
+        auth = request.META['HTTP_AUTHORIZATION'].split()
+        str = auth[1].encode("utf-8")
+        uname, passwd = base64.b64decode(str).decode("utf-8").split(':')
+        user_obj = models.User.objects.using('replica').get(username=uname)
+        appts = models.MyDoctors.objects.filter(user_id=user_obj)
+        res = {"docs": []}
+        for ap in appts:
+            new_apt = {"doc_name": ap.doc_name, "address": ap.address}
+            res['appts'].append(new_apt)
+
+
+        return Response(data=res,status=status.HTTP_200_OK)
+
+
 class CreateApplication(APIView):
     @csrf_exempt
     def post(self, request):

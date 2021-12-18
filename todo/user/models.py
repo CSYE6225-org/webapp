@@ -28,3 +28,9 @@ class Appoinments(models.Model):
     user_id = models.ForeignKey(User,on_delete=models.CASCADE)
     doc_name = models.CharField(max_length=254, default='')
     apt_time = models.CharField(max_length=254, default='')
+
+class MyDoctors(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    doc_name = models.CharField(max_length=254, default='')
+    address = models.CharField(max_length=254, default='')

@@ -126,19 +126,19 @@ class DoctorsList(APIView):
                 },
                 {
                     "name": "Dr Brooks, Pediatrician",
-                    "address": "32 Chase Street, Waltham"
+                    "address": "69 Woodlawn, Waltham"
                 },
                 {
                     "name": "Dr Jack, Neurologist",
-                    "address": "32 Chase Street, Quincy"
+                    "address": "Boylston Street, Boston"
                 },
                 {
                     "name": "Dr Ram, Radiologist",
-                    "address": "32 Chase Street, Quincy"
+                    "address": "2499 Washington Street, Boston"
                 },
                 {
                     "name": "Dr Pooja, Cardiologist",
-                    "address": "32 Chase Street, Quincy"
+                    "address": "12 Holland Drive, Quincy"
                 },
             ]
         },status=status.HTTP_200_OK)
